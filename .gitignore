@@ -1,0 +1,50 @@
+# Python & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Ambientes Virtuais
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Testes & Qualidade (Pytest, Coverage, Mypy)
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+.mypy_cache/
+.ruff_cache/
+
+# Dados Temporários e Logs de Teste
+dados_teste/
+*.log
+tmp/
+temp/
+
+# Modelos de IA e Pesos do PyTorch
+*.pt
+*.pth
+*.onnx
+*.bin
+*.safetensors
+
+# IDEs & Sistema Operativo
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Empacotamento / Build
+build/
+dist/
+*.egg-info/
+.eggs/
