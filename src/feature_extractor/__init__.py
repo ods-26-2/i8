@@ -4,7 +4,7 @@ import torch
 from torch import Tensor, nn
 from torchvision.models import resnet18
 
-from i8.preprocessing import WEIGHTS
+from i8.src.preprocessing import WEIGHTS
 
 
 class FeatureExtractor:
