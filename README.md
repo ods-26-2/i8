@@ -152,3 +152,9 @@ foram duplicados neste repositório.
 - Processa uma imagem por vez e mantém embeddings em memória (N×512). Não é um
   pipeline de tempo real e não promete o SLA de 200 ms do sistema completo.
 - Modelos, pesos e datasets grandes não devem ser adicionados ao Git.
+
+## Docker (Build e Teste)
+
+- Construir o docker para testes.
+- Rodar a pasta de testes.
+- Adicionando o seginte comando no terminal: `docker build -t motor-similaridade . && docker run --rm motor-similaridade`.
