@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ods:defect-taxonomy-descriptor:1.0",
+  "type": "object", "additionalProperties": false,
+  "required": ["artifact_id", "artifact_version", "kind", "owner", "uri", "hash_sha256", "valid_from", "schema_version"],
+  "properties": {
+    "artifact_id": {"type": "string", "pattern": "\\S"}, "artifact_version": {"type": "string", "pattern": "\\S"},
+    "kind": {"const": "DEFECT_TAXONOMY"}, "owner": {"const": "A1"},
+    "uri": {"type": "string", "format": "uri", "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"},
+    "hash_sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+    "valid_from": {"type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"},
+    "schema_version": {"const": "1.0"}
+  }
+}

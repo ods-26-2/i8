@@ -1,0 +1,3 @@
+# Lightweight S3-01/S3-02 validation and tests. No ML runtime or model download.
+pytest>=8,<10
+jsonschema>=4.23,<5

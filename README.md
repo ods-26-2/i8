@@ -124,13 +124,22 @@ média, desvio, leitura/escrita, dados inválidos e diferentes produtos.
 
 ## Contratos de integração
 
-- `shared/schemas/i8-piece-analyzed.schema.json`: schema do evento publicado;
-- `shared/mocks/i8-piece-*.json`: exemplos de saída do I8;
-- `docs/contratos/i8-a1.md`: contrato entre I8 e A1;
-- `docs/contratos/b1.md`: envelope comum dos eventos.
+- `src/contracts/`: construção e validação estrita de
+  `ods.i8.piece_analysis` 1.0;
+- `src/taxonomy/`: carga e verificação do `DEFECT_TAXONOMY` versionado do A1;
+- `shared/schemas/6c/`: schemas do evento e do artefato;
+- `docs/contratos/migracao-6c.md`: decisões e limites de S3-01/S3-02.
 
 A taxonomia completa e os eventos de triagem pertencem ao A1 e, por isso, não
 foram duplicados neste repositório.
+
+Os módulos novos são independentes de Torch. Para executar somente os testes de
+contrato e taxonomia:
+
+```powershell
+python -m pip install -r requirements-contracts.txt
+python -m pytest -q tests/test_contracts_6c.py
+```
 
 ## Limitações e escopo
 
@@ -138,8 +147,9 @@ foram duplicados neste repositório.
   **não executa triagem** e **não implementa similaridade final**. Essas funções
   pertencem a outras etapas/responsabilidades: classificação na Sprint 2 de João;
   similaridade e triagem de Ícaro. Não implementa responsabilidades de Samuel.
-- Não altera o contrato I8 → A1 nem implementa frontend, backend A1, banco,
-  MQTT, P7, I11/P2, relatórios ou auditoria.
+- Implementa apenas a fronteira contratual de S3-01 e a carga da taxonomia de
+  S3-02. Não implementa frontend, backend A1, banco, MQTT, P7, P2, relatórios,
+  auditoria ou a inferência dos quatro resultados.
 - Pesos ImageNet são genéricos e não foram ajustados nem validados para um produto
   industrial. A média é uma referência inicial, não um detector ou decisão de
   conformidade; não produz distância, limiar, confiança ou aprovação/reprovação.
