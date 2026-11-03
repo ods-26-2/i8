@@ -55,6 +55,20 @@ def test_calculo_similaridade_identica(motor_teste, imagens_teste):
     assert score == pytest.approx(1.0, rel=1e-3)
 
 
+#Exigência S2-04: Garantir o mapeamento de -1.0 para 0.0
+def test_calculo_similaridade_escala_normalizada(motor_teste):
+    """Garante que a similaridade bruta de -1.0 (opostos) é mapeada para 0.0 na Arq 6c."""
+    # Cria dois vetores perfeitamente opostos
+    vetor_positivo = torch.tensor([[1.0, 1.0]])
+    vetor_negativo = torch.tensor([[-1.0, -1.0]])
+    
+    score = motor_teste.calcular_score(vetor_positivo, vetor_negativo)
+    
+    # Usa 'abs' (tolerância absoluta) em vez de 'rel', pois o alvo é exatamente 0.0
+    assert score == pytest.approx(0.0, abs=1e-5)
+    assert score >= 0.0  # Nunca pode ser negativo no novo contrato
+
+
 def test_triagem_limiar_duplo_regras():
     """Testa as lógicas de negócio dos limiares."""
     assert aplicar_triagem_limiar_duplo(0.96)[0] == "APROVADO"
@@ -68,7 +82,6 @@ def test_deve_falhar_com_arquivo_inexistente(motor_teste):
     """Garante que a exceção correta é lançada se a imagem não existir."""
     caminho_invalido = "diretorio_fantasma/imagem_que_nao_existe.jpg"
     
-    # O pytest.raises verifica se a exceção esperada foi realmente atirada
     with pytest.raises(ImageProcessingError, match="não existe"):
         motor_teste.extrair_vetor(caminho_invalido)
 
@@ -78,5 +91,6 @@ def test_deve_falhar_com_arquivo_corrompido(motor_teste, tmp_path):
     arquivo_corrompido = tmp_path / "texto_falso.jpg"
     arquivo_corrompido.write_text("Isto não é um binário de imagem, é apenas texto.")
     
-    with pytest.raises(ImageProcessingError, match="inválido ou corrompido"):
+    #A string deve corresponder à nova mensagem de erro lançada no try/except do motor
+    with pytest.raises(ImageProcessingError, match="Falha ao extrair vetor da imagem"):
         motor_teste.extrair_vetor(arquivo_corrompido)
