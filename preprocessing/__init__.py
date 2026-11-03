@@ -26,3 +26,8 @@ def load_image(path: Path) -> Tensor:
     with Image.open(path) as image:
         rgb = ImageOps.exif_transpose(image).convert("RGB")
         return WEIGHTS.transforms()(rgb)
+
+
+def transform_image(image: Image.Image) -> Tensor:
+    """Apply exactly the same official ImageNet preprocessing to an in-memory image."""
+    return WEIGHTS.transforms()(ImageOps.exif_transpose(image).convert("RGB"))
