@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ods-i8"
+version = "3.0.0"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26,<3", "Pillow>=10,<12", "torch>=2.2", "torchvision>=0.17"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["preprocessing", "feature_extractor", "normal_model", "src", "src.*", "scripts"]
+
+[project.scripts]
+i8-prepare-dataset = "scripts.prepare_dataset:main"
+i8-build-normal = "scripts.build_normal_model:main"
+i8-train-classifier = "scripts.train_classifier:main"
+i8-calibrate = "scripts.calibrate_policy:main"
+i8-evaluate = "scripts.evaluate:main"
+i8-infer = "scripts.infer_image:main"
+i8-replay = "scripts.replay:main"
+i8-benchmark = "scripts.benchmark:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9", "jsonschema>=4.23,<5"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

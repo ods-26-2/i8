@@ -1,164 +1,99 @@
-# I8 — Modelagem do normal (Sprint 1)
+# I8 — Inferência e modelagem do normal (Sprint 3)
 
-Entrega de João Vitor: uma representação inicial da peça correta, construída
-exclusivamente a partir de imagens previamente consideradas normais. O mesmo
-código atende diferentes produtos; cada execução informa seu `product_id`.
-
-Modelar o normal, nesta versão, significa extrair um vetor de 512 características
-de cada imagem e calcular o centro (média por dimensão) desses vetores. Também
-guardamos o desvio padrão populacional (`ddof=0`). Não há treinamento da rede.
-
-## Arquitetura
-
-- `i8/preprocessing/`: listagem de imagens, correção da orientação EXIF,
-  conversão RGB e transformação oficial dos pesos da ResNet18.
-- `i8/feature_extractor/`: ResNet18 com pesos `IMAGENET1K_V1`, camada final
-  substituída por identidade, modo de avaliação e gradientes desativados.
-- `i8/normal_model/`: cálculo das estatísticas e salvamento/leitura de JSON.
-- `i8/similarities_extractor/`: extração de vetores e similaridade por cosseno.
-- `scripts/build_normal_model.py`: argumentos, execução e resumo no terminal.
-- `tests/`: testes locais com imagens sintéticas pequenas e temporárias.
-- `models/`: destino sugerido dos artefatos, ignorados pelo Git.
-- `shared/` e `docs/contratos/`: contrato de saída e exemplos de integração.
-
-Os parâmetros de execução são passados pela CLI. O `pyproject.toml` mantém a
-configuração do pacote e dos testes na raiz do repositório.
+Fluxo local reproduzível: manifesto → modelo normal e classificador → calibração
+→ inferência → evento 6c validado. A execução real usa ResNet18 com pesos oficiais
+`IMAGENET1K_V1`; testes podem injetar doubles explicitamente.
 
 ## Instalação
 
-Use Python 3.11 ou superior em ambiente virtual. Na raiz do repositório:
+```powershell
+uv sync --extra dev
+uv build --wheel
+```
+
+O wheel inclui `preprocessing`, `feature_extractor`, `normal_model`, `src` e os
+comandos instaláveis. Contratos e taxonomia podem ser importados sem importar
+Torch: `import src.contracts, src.taxonomy`.
+
+## Dataset e comandos
+
+[`dataset/manifest.example.csv`](dataset/manifest.example.csv) documenta os
+campos `product_id,image,label,piece_id,session_id,split`; `source_image` é
+opcional para aumentos. Caminhos relativos são resolvidos a partir do manifesto.
+O validador rejeita campos vazios, splits/rótulos inválidos, imagens ilegíveis,
+peças ou sessões em splits diferentes e imagens duplicadas por SHA-256.
 
 ```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-python -m pip install -r requirements-dev.txt
+uv run i8-prepare-dataset dataset/manifest.csv
+uv run i8-build-normal --product produto_001 --images data/produto_001/train/normal --output models
+uv run i8-train-classifier --manifest dataset/manifest.csv --taxonomy ..\a1\shared\artifacts\defect-taxonomy\defects-a1-1.0.0\content.json --taxonomy-descriptor ..\a1\shared\artifacts\defect-taxonomy\defects-a1-1.0.0\descriptor.json --taxonomy-version defects-a1-1.0.0 --product produto_001 --output models/classifier.json
+uv run i8-calibrate --input calibration.jsonl --output models/policy.json --product produto_001 --normal-version normal-1.0.0 --classifier-version classifier-1.0.0 --taxonomy-version defects-a1-1.0.0
+uv run i8-infer --image data/produto_001/test.jpg --normal-model models/normal_produto_001_normal-1.0.0.json --classifier models/classifier.json --policy models/policy.json --taxonomy ..\a1\shared\artifacts\defect-taxonomy\defects-a1-1.0.0\content.json --taxonomy-descriptor ..\a1\shared\artifacts\defect-taxonomy\defects-a1-1.0.0\descriptor.json --taxonomy-version defects-a1-1.0.0
+uv run i8-replay --input replay.jsonl --output events.jsonl --normal-model models/normal.json --classifier models/classifier.json --policy models/policy.json --taxonomy taxonomy.json --taxonomy-descriptor descriptor.json --taxonomy-version defects-a1-1.0.0 --artifact-version composition-1.0.0
+uv run i8-evaluate test-predictions.jsonl --output reports/evaluation.json
+uv run i8-benchmark --image data/produto_001/test.jpg --repeat 10 --output reports/benchmark.json --normal-model models/normal.json --classifier models/classifier.json --policy models/policy.json --taxonomy taxonomy.json --taxonomy-descriptor descriptor.json --taxonomy-version defects-a1-1.0.0
+uv run python -m pytest -q
 ```
 
-Em Linux/macOS, ative com `source .venv/bin/activate`. Para uso sem testes,
-instale apenas `requirements.txt`.
+O modo normal-only de `i8-infer` exige a opção explícita `--normal-only` e não
+classifica defeitos conhecidos. O modo completo exige classificador e política.
+Artefatos ausentes ou incompatíveis são erros, nunca defaults silenciosos.
 
-Dependências: PyTorch, torchvision, NumPy e Pillow; pytest para testes.
-O instalador deve resolver uma dupla compatível de torch/torchvision dentro das
-faixas declaradas. CUDA não é obrigatória. Para CUDA, o ambiente precisa de uma
-instalação compatível do PyTorch e dos drivers.
+## Modelo, política e contrato
 
-Na primeira execução com imagens válidas, torchvision baixa os pesos pré-treinados
-(aproximadamente 45 MB) para o cache do PyTorch. Essa etapa requer internet; depois,
-o cache pode ser reutilizado offline. `TORCH_HOME` permite escolher o cache.
-Falhas no download interrompem a execução: não há fallback para pesos aleatórios.
+O modelo normal usa exclusivamente amostras `CONFORMING` do split `train`. O
+classificador é uma regressão softmax linear determinística sobre embeddings
+ResNet18, treinada por gradiente descendente com semente e persistida com produto,
+classes, ordem, dimensão, pesos e versão do pré-processamento. O softmax é apenas
+confiança operacional do classificador conhecido; não prova ausência de anomalia
+desconhecida.
 
-## Dataset e execução
+A política é versionada e calibrada exclusivamente no split `calibration`. A
+precedência é:
 
-Prepare imagens normais do mesmo produto e condições de captura consistentes:
+1. classe conhecida acima de `known_confidence` e fora da região normal:
+   `NON_CONFORMING`;
+2. similaridade acima de `conforming_similarity` com margem inclusiva:
+   `CONFORMING`;
+3. similaridade abaixo de `anomaly_similarity` com margem inclusiva:
+   `ANOMALY`;
+4. demais casos: `UNCERTAIN`.
 
-```text
-data/
-└── produto_001/
-    └── train/
-        └── normal/
-            ├── img001.jpg
-            └── img002.png
-```
+`uncertain_margin` cria uma faixa de segurança junto aos limites; as fronteiras
+sem margem são inclusivas nos limites configurados. `ANOMALY` é desvio detectado,
+enquanto `UNCERTAIN` é abstenção por evidência ambígua.
 
-`data/` não é versionado. Os formatos aceitos são JPG/JPEG, PNG, BMP, TIFF/TIF e
-WebP, com extensões sem distinção entre maiúsculas e minúsculas. A listagem é
-ordenada, sem busca em subpastas; arquivos de outras extensões são ignorados.
+O evento continua `ods.i8.piece_analysis`, schema `1.0`, produtor I8. A construção
+e validação reutilizam `build_piece_analysis` e `validate_piece_analysis`.
+`taxonomy_version` e `artifact_version` identificam os artefatos efetivos;
+`defect_class` só é publicado em `NON_CONFORMING`. Mídia, evidência S4 e decisões
+de negócio A1 não entram no evento.
 
-Na raiz do repositório:
+## Runtime, replay e benchmark
 
-```powershell
-python scripts/build_normal_model.py --product produto_001 --images ./data/produto_001/train/normal --output ./models
-```
+[`src/runtime.py`](src/runtime.py) correlaciona por `source_id`, `session_id` e
+`frame_index`. A bbox é `[x_min,y_min,x_max,y_max]`. Há limite de quantidade,
+TTL configurável usando relógio local de chegada e distinção de expiração nas
+estatísticas. O limite de quantidade não é limite fixo em bytes. O replay executa
+inferência real, fecha os recortes temporários e escreve eventos 6c validados.
 
-Parâmetros opcionais: `--model-version 1.0.0` e `--device cpu|auto|cuda`.
-CPU é o padrão; `auto` seleciona CUDA quando disponível e CPU caso contrário.
-Solicitar `cuda` explicitamente sem suporte gera erro.
+O benchmark separa aquecimento, pré-processamento, extração, decisão e montagem/
+validação do evento; exporta média, p50, p95, hardware, dispositivo, artefatos e
+memória medida por `tracemalloc`. A medição é local e não comprova SLA ponta a
+ponta.
 
-Para outro produto, altere `--product` e `--images`. Cada execução cria um arquivo
-único; não sobrescreve modelos anteriores. O identificador do produto fica nos
-metadados, sem ser usado como caminho no sistema de arquivos.
+## Estado Sprint 3
 
-O resumo informa produto, imagens encontradas/processadas/ignoradas, extrator,
-dispositivo, dimensão e caminho do artefato. Imagens corrompidas geram avisos com
-seus caminhos e são ignoradas. Pasta inválida, vazia ou sem imagens válidas resulta
-em código de saída 1 e nenhum novo artefato.
+- S3-01/S3-02: implementado — contrato 6c e taxonomia A1 versionada com hash.
+- S3-04: parcial — branch de similaridade de Ícaro inspecionada; a transformação
+  incompatível não foi mesclada.
+- S3-05: implementado no fluxo local; avaliação industrial permanece pendente
+  até haver dataset real separado por peça/sessão.
+- S3-06: implementado no replay local; integração externa P2/P4/P6/B1 permanece
+  pendente por ausência de contratos/bibliotecas operacionais.
+- S3-12: ferramentas e testes implementados; hardware-alvo e dados reais ainda
+  são necessários para evidência de desempenho e qualidade.
 
-## Artefato
-
-Um arquivo `normal_<data UTC>_<identificador>.json` contém:
-
-| Campo | Conteúdo |
-| --- | --- |
-| `product_id` | Identificador recebido pela CLI |
-| `model_version` | Versão informada, padrão `1.0.0` |
-| `feature_extractor` | `resnet18` |
-| `weights` | `IMAGENET1K_V1` |
-| `image_count` | Quantidade efetivamente processada |
-| `embedding_dim` | 512 |
-| `mean` | Lista com a média por dimensão |
-| `std` | Lista com o desvio padrão por dimensão |
-| `created_at` | Data/hora ISO 8601 com fuso UTC |
-
-JSON foi escolhido porque os dois vetores de 512 valores são pequenos, legíveis
-e permanecem junto dos metadados, sem sincronização entre arquivos. Leitura:
-
-```python
-from pathlib import Path
-from i8.normal_model import NormalModel
-
-model = NormalModel.load(Path("models/normal_<data UTC>_<identificador>.json"))
-print(model.product_id, model.embedding_dim, model.mean[:5])
-```
-
-## Testes
-
-```powershell
-python -m pytest -q
-```
-
-Os testes não exigem GPU, internet nem pesos baixados. Exercitam o pré-processamento
-real e a arquitetura ResNet18 real; substituem o carregamento dos pesos por pesos
-aleatórios **somente nos testes**. Isso verifica dimensões e funcionamento do
-pipeline, sem comprovar qualidade dos embeddings pré-treinados. Também verificam
-média, desvio, leitura/escrita, dados inválidos e diferentes produtos.
-
-## Contratos de integração
-
-- `src/contracts/`: construção e validação estrita de
-  `ods.i8.piece_analysis` 1.0;
-- `src/taxonomy/`: carga e verificação do `DEFECT_TAXONOMY` versionado do A1;
-- `shared/schemas/6c/`: schemas do evento e do artefato;
-- `docs/contratos/migracao-6c.md`: decisões e limites de S3-01/S3-02.
-
-A taxonomia completa e os eventos de triagem pertencem ao A1 e, por isso, não
-foram duplicados neste repositório.
-
-Os módulos novos são independentes de Torch. Para executar somente os testes de
-contrato e taxonomia:
-
-```powershell
-python -m pip install -r requirements-contracts.txt
-python -m pytest -q tests/test_contracts_6c.py
-```
-
-## Limitações e escopo
-
-- Esta implementação ainda **não classifica tipos conhecidos de defeitos**,
-  **não executa triagem** e **não implementa similaridade final**. Essas funções
-  pertencem a outras etapas/responsabilidades: classificação na Sprint 2 de João;
-  similaridade e triagem de Ícaro. Não implementa responsabilidades de Samuel.
-- Implementa apenas a fronteira contratual de S3-01 e a carga da taxonomia de
-  S3-02. Não implementa frontend, backend A1, banco, MQTT, P7, P2, relatórios,
-  auditoria ou a inferência dos quatro resultados.
-- Pesos ImageNet são genéricos e não foram ajustados nem validados para um produto
-  industrial. A média é uma referência inicial, não um detector ou decisão de
-  conformidade; não produz distância, limiar, confiança ou aprovação/reprovação.
-- O resize mantém a proporção com lado menor 256, seguido de recorte central
-  224×224, conversão para [0, 1] e normalização ImageNet. O recorte pode perder
-  detalhes nas bordas; use imagens com o produto centralizado.
-- Iluminação, fundo, posição e diversidade dos dados afetam a representação.
-  Uma única imagem é aceita, mas seu desvio será zero e sua representatividade
-  limitada. Diferentes modos normais podem não ser bem resumidos por uma média.
-- Processa uma imagem por vez e mantém embeddings em memória (N×512). Não é um
-  pipeline de tempo real e não promete o SLA de 200 ms do sistema completo.
-- Modelos, pesos e datasets grandes não devem ser adicionados ao Git.
+Validação atual: `84 passed`, wheel construído e imports verificados em ambiente
+temporário fora do repositório. Não são escopo backend A1, banco, revisão humana,
+relatórios de negócio, S4, S5 ou P7.
