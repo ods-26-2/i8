@@ -1,0 +1,10 @@
+Sprint 3 — Publicação Kafka I8, atividade 06
+Data: 05/11/2026
+Base main: 66ee06599182aa78eedf9d58bc4041db54ecc4fd
+Branch local: feat/publisher-kafka-i8, alterações ainda sem commit
+
+Comando: docker compose -p ver1-i8-publisher -f validacao-local/compose.publisher.yml run --rm --build publisher-tests python -m pytest -q -p no:cacheprovider tests/test_contracts_6c.py tests/test_kafka_contract_1_1_candidate.py tests/test_kafka_contract_2_0.py tests/test_kafka_publisher.py tests/test_replay_publication.py tests/test_kafka_publisher_integration.py
+
+........................................................................ [ 51%]
+.....................................................................    [100%]
+141 passed in 2.24s

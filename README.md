@@ -1,5 +1,8 @@
 # I8 — Inferência e modelagem do normal (Sprint 3)
 
+Para acompanhar a entrega do publisher, comece pelo
+[resumo da atividade 06 e sua relação com a arquitetura](docs/sprints/atividade-06-resumo.md).
+
 Fluxo local reproduzível: manifesto → modelo normal e classificador → calibração
 → inferência → evento 6c validado. A execução real usa ResNet18 com pesos oficiais
 `IMAGENET1K_V1`; testes podem injetar doubles explicitamente.
@@ -68,8 +71,9 @@ O contrato final Kafka é `ods.industria.defeito_classificado`, versão `2.0`, c
 substituída antes da ativação. Durante a estratégia expand, o builder mantém por
 padrão o legado `ods.i8.piece_analysis`/`1.0`; a versão `2.0` deve ser solicitada
 explicitamente. Pares cruzados e a candidata substituída são recusados. Consulte
-[contrato e migração](docs/contratos/kafka-i8-2.0.md). O transporte Kafka e a
-ativação compartilhada ainda não estão implementados neste incremento. A construção
+[contrato e migração](docs/contratos/kafka-i8-2.0.md). O transporte Kafka 2.0 está
+implementado no [publisher e replay opcional](docs/kafka-publisher.md); a ativação
+no barramento compartilhado permanece pendente. A construção
 e validação reutilizam `build_piece_analysis` e `validate_piece_analysis`.
 `taxonomy_version` e `artifact_version` identificam os artefatos efetivos;
 `defect_class` só é publicado em `NON_CONFORMING`. Mídia, evidência S4 e decisões
@@ -100,6 +104,8 @@ ponta.
 - S3-12: ferramentas e testes implementados; hardware-alvo e dados reais ainda
   são necessários para evidência de desempenho e qualidade.
 
-Validação atual: `84 passed`, wheel construído e imports verificados em ambiente
-temporário fora do repositório. Não são escopo backend A1, banco, revisão humana,
+Validação histórica do fluxo de inferência: `84 passed`, wheel construído e imports verificados em ambiente
+temporário fora do repositório. A validação do novo publisher está nas
+[evidências da atividade 06](docs/evidencias/publicacao-kafka-i8/README.md); ela não reexecuta a suíte completa com Torch.
+Não são escopo backend A1, banco, revisão humana,
 relatórios de negócio, S4, S5 ou P7.

@@ -2,6 +2,10 @@
 
 Decisao de implementacao VER-1: topico e schema `ods.industria.defeito_classificado`, `schema_version` **2.0**, produtor `I8`, tipo `event`. O nome segue o dominio funcional do Guia B2. A ativacao no barramento compartilhado e o aceite TRA-1 continuam pendentes; este PR nao implementa publisher Kafka nem comprova integracao real.
 
+O parágrafo acima registra o escopo do incremento original de contrato. O
+publisher foi acrescentado posteriormente na atividade 06; consulte o
+[resumo da entrega e da arquitetura](../sprints/atividade-06-resumo.md).
+
 ## Versoes e estrategia expand
 
 | Interface | Identidade | Estado |

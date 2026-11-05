@@ -1,0 +1,52 @@
+services:
+  kafka:
+    image: apache/kafka:3.9.1
+    hostname: kafka
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      KAFKA_HEAP_OPTS: -Xms256m -Xmx512m
+      CLUSTER_ID: Qy0ysubDRN2sUKS2fPMXLw
+    healthcheck:
+      test: [CMD-SHELL, "/opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --list >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+      start_period: 15s
+
+  kafka-init:
+    image: apache/kafka:3.9.1
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: [/opt/kafka/bin/kafka-topics.sh]
+    command: [--bootstrap-server, "kafka:9092", --create, --if-not-exists, --topic, ods.industria.defeito_classificado, --partitions, "1", --replication-factor, "1"]
+
+  publisher-tests:
+    build:
+      context: ..
+      dockerfile: validacao-local/Dockerfile.publisher
+    user: "${VER1_UID:-1000}:${VER1_GID:-1000}"
+    environment:
+      I8_KAFKA_LOCAL_TEST: "1"
+      I8_TEST_TAXONOMY_DIR: /taxonomies/defects-a1-1.0.0
+      I8_TEST_REPORT: /evidencias/publisher-kafka.json
+      KAFKA_BROKER_URL: kafka:9092
+    volumes:
+      - ../../a1/shared/artifacts/defect-taxonomy:/taxonomies:ro
+      - ./evidencias:/evidencias
+    command: [python, -m, pytest, -q, -p, "no:cacheprovider", tests/test_kafka_publisher_integration.py]
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
