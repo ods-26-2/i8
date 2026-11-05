@@ -60,7 +60,13 @@ def test_mismatched_dimensions_do_not_broadcast(motor):
 
 
 def test_path_and_pil_use_same_preprocessing_and_one_existing_extractor(tmp_path, monkeypatch):
-    image = Image.new('RGB', (320, 240), (32, 64, 128))
+    # A non-uniform, non-square image distinguishes resize/crop implementations.
+    pixels = np.zeros((240, 320, 3), dtype=np.uint8)
+    pixels[:, :, 0] = np.arange(320, dtype=np.uint16) % 256
+    pixels[:, :, 1] = np.arange(240, dtype=np.uint8)[:, None]
+    pixels[:, :, 2] = 128
+    image = Image.fromarray(pixels)
+    original = image.tobytes()
     path = tmp_path / 'frame.png'
     image.save(path)
     extractor = ExtractorDouble()
@@ -70,8 +76,9 @@ def test_path_and_pil_use_same_preprocessing_and_one_existing_extractor(tmp_path
     assert first.shape == (1, 512) and torch.equal(first, second)
     assert torch.equal(load_image(path), transform_image(image))
     assert torch.equal(extractor.inputs[0], extractor.inputs[1])
+    assert torch.equal(extractor.inputs[0], transform_image(image))
     assert motor.modelo is extractor.model and motor.extractor is extractor
-    assert image.getpixel((0, 0)) == (32, 64, 128)
+    assert image.tobytes() == original
 
 
 def test_default_constructor_creates_one_canonical_extractor(monkeypatch):
