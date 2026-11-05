@@ -1,0 +1,44 @@
+{
+  "status": "publisher-kafka-local-aprovado",
+  "synthetic_events": true,
+  "real_inference": false,
+  "shared_broker": false,
+  "a1_persistence_tested": false,
+  "schema": "ods.industria.defeito_classificado",
+  "schema_version": "2.0",
+  "publications": 5,
+  "unique_events": 4,
+  "receipts": [
+    {
+      "message_id": "ef349e51-64ff-4390-be3d-614ea9c78525",
+      "topic": "ods.industria.defeito_classificado",
+      "partition": 0,
+      "offset": 10
+    },
+    {
+      "message_id": "c79432eb-0587-435a-99f8-59a2ae243cfe",
+      "topic": "ods.industria.defeito_classificado",
+      "partition": 0,
+      "offset": 11
+    },
+    {
+      "message_id": "e191a283-67f1-4ff5-96b0-535d0e8dfb79",
+      "topic": "ods.industria.defeito_classificado",
+      "partition": 0,
+      "offset": 12
+    },
+    {
+      "message_id": "c3ed1682-b34d-43c8-8773-7a61ba66d956",
+      "topic": "ods.industria.defeito_classificado",
+      "partition": 0,
+      "offset": 13
+    },
+    {
+      "message_id": "ef349e51-64ff-4390-be3d-614ea9c78525",
+      "topic": "ods.industria.defeito_classificado",
+      "partition": 0,
+      "offset": 14
+    }
+  ],
+  "received_events_equal_input": true
+}

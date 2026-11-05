@@ -20,10 +20,12 @@ i8-calibrate = "scripts.calibrate_policy:main"
 i8-evaluate = "scripts.evaluate:main"
 i8-infer = "scripts.infer_image:main"
 i8-replay = "scripts.replay:main"
+i8-publish-events = "scripts.publish_events:main"
 i8-benchmark = "scripts.benchmark:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<9", "jsonschema>=4.23,<5"]
+kafka = ["confluent-kafka>=2.6,<3"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

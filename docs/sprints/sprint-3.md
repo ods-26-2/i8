@@ -4,7 +4,7 @@ Este índice organiza a documentação por assunto e pelo plano coletivo de fech
 
 ## Contrato Kafka I8/A1 — atividades 01–02
 
-Escopo: tópico/schema final `ods.industria.defeito_classificado`, versão 2.0, captured_at/occurred_at/published_at, validação, fixtures e compatibilidade explícita com legado `ods.i8.piece_analysis`/1.0. A candidata 1.1 foi substituída antes da ativação; aceite externo TRA-1 e transporte real permanecem pendentes.
+Escopo: tópico/schema final `ods.industria.defeito_classificado`, versão 2.0, captured_at/occurred_at/published_at, validação, fixtures e compatibilidade explícita com legado `ods.i8.piece_analysis`/1.0. A candidata 1.1 foi substituída antes da ativação; aceite externo TRA-1 e ativação no barramento compartilhado permanecem pendentes.
 
 - [Contrato e decisões](../contratos/kafka-i8-2.0.md).
 - [Evidências de contrato](../evidencias/contrato-kafka-2.0/README.md).
@@ -22,7 +22,9 @@ As evidências distinguem testes unitários com Kafka simulado de uma prova loca
 
 ## Publicação e integração I8 — atividade 06 e provas 07–09/18
 
-O publisher Kafka I8 é o próximo incremento de implementação, com João como responsável principal e apoio de Ícaro no transporte. Samuel participa das provas A1. O fluxo real e os testes de recuperação em falhas precisam de aceite próprio.
+Comece pelo [resumo da atividade 06 e sua relação com a arquitetura](atividade-06-resumo.md).
+
+O [publisher Kafka I8 e o replay opcional](../kafka-publisher.md) estão implementados na branch `feat/publisher-kafka-i8`, para revisão com João, responsável principal, e apoio de Ícaro no transporte. O caminho 2.0 valida antes do envio e exige confirmação de entrega. A prova local usa eventos sintéticos, não inferência real. Samuel participa das provas A1. A ativação compartilhada e o fluxo real I8 → A1 precisam de aceite próprio; este incremento não encerra as atividades 17–18.
 
 ## Outros escopos do fechamento
 

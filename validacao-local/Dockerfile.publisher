@@ -1,0 +1,7 @@
+FROM python:3.11-slim
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PYTHONPATH=/repo
+WORKDIR /repo
+COPY requirements-kafka.txt requirements-contracts.txt ./
+RUN pip install --no-cache-dir -r requirements-kafka.txt -r requirements-contracts.txt "pytest>=8,<9" "Pillow>=10,<12" uv
+COPY . .
+CMD ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/test_contracts_6c.py", "tests/test_kafka_contract_1_1_candidate.py", "tests/test_kafka_contract_2_0.py", "tests/test_kafka_publisher.py", "tests/test_replay_publication.py"]

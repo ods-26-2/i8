@@ -48,3 +48,6 @@ build/
 dist/
 *.egg-info/
 .eggs/
+
+# Generated evidence from the disposable Kafka publisher laboratory
+validacao-local/evidencias/
