@@ -131,6 +131,13 @@ uma evidência de SLA.
 
 ## Referências
 
+A [automação no GitHub Actions](../.github/workflows/testes-publisher.yml) executa
+a mesma seleção em Docker, separando contratos/publisher/replay dos dois testes
+com broker real. A taxonomia A1 é obtida do commit fixo
+`f4141bb43a2d13127cf2dcc380d991322be7ad35`, mantendo os repositórios lado a lado.
+Os relatórios XML, logs, ambiente e JSON da prova ficam no pacote
+`evidencias-publisher-i8`, retido por 30 dias. Os testes locais continuam disponíveis.
+
 - [Evidências locais e limites](evidencias/publicacao-kafka-i8/README.md).
 - [Contrato industrial 2.0](contratos/kafka-i8-2.0.md).
 - [Cliente Python oficial: callbacks e flush](https://docs.confluent.io/kafka-clients/python/current/index.html).

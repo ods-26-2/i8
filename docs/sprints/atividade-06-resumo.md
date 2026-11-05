@@ -51,3 +51,12 @@ desenvolvimento conforme decisão de Ícaro.
 Para acompanhar esta entrega, comece por esta página. Abra o
 [roteiro técnico](../kafka-publisher.md) apenas para executar comandos, ou as
 [evidências](../evidencias/publicacao-kafka-i8/README.md) para conferir os testes.
+
+## Testes automáticos no PR
+
+O GitHub Actions repete os testes dentro do Docker quando um PR para `main` é
+aberto ou atualizado. No PR, abra **Checks** e selecione **Publisher I8 em
+Docker**. Ao abrir a execução, o pacote **evidencias-publisher-i8** reúne os
+resultados e logs para download. O laboratório é encerrado ao final, mesmo em
+falha. Essa automação facilita repetir e comprovar os testes; não cria uma
+obrigação coletiva além das regras definidas pela disciplina e pela equipe.
