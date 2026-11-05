@@ -1,0 +1,8 @@
+FROM python:3.11-slim
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PYTHONPATH=/repo OMP_NUM_THREADS=2 MKL_NUM_THREADS=2
+WORKDIR /repo
+RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu "torch>=2.2" "torchvision>=0.17"
+COPY requirements-contracts.txt requirements-kafka.txt ./
+RUN pip install --no-cache-dir -r requirements-contracts.txt -r requirements-kafka.txt "pytest>=8,<9" "numpy>=1.26,<3" "Pillow>=10,<12" "setuptools>=68" wheel
+COPY . .
+CMD ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider"]
