@@ -1,9 +1,15 @@
-"""Strict 6c 1.0 producer contract; deliberately independent of ML runtimes."""
+"""Strict legacy 1.0 and industrial 2.0 contracts, independent of ML runtimes."""
 
 from datetime import datetime, timezone
 import math
 import re
 from uuid import UUID, uuid4
+
+
+LEGACY_SCHEMA = "ods.i8.piece_analysis"
+INDUSTRIAL_SCHEMA = "ods.industria.defeito_classificado"
+# Kafka topic equals the schema identity; transport activation is separate.
+SCHEMAS_BY_VERSION = {"1.0": LEGACY_SCHEMA, "2.0": INDUSTRIAL_SCHEMA}
 
 
 class ContractError(ValueError):
@@ -52,17 +58,23 @@ def require_integer(value, field):
 def validate_piece_analysis(event, taxonomy):
     """Validate structure and the loaded taxonomy before publication; return event.
 
-    This is a strict 1.0 producer gate, not the forward-compatible A1 consumer.
+    This is a strict producer gate, not the forward-compatible A1 consumer.
+    Version 2.0 requires occurred_at explicitly; candidate 1.1 was superseded.
     A taxonomy is required because JSON Schema alone cannot validate class IDs.
     """
+    version = event.get("schema_version") if isinstance(event, dict) else None
+    if version not in SCHEMAS_BY_VERSION:
+        raise ContractError("schema_version: expected legacy 1.0 or industrial 2.0; candidate 1.1 is superseded")
     required = (
         "message_type", "message_id", "schema", "schema_version", "producer",
         "published_at", "captured_at", "source_id", "session_id", "sequence",
         "artifact_version", "payload",
     )
+    if version == "2.0":
+        required += ("occurred_at",)
     require_keys(event, required, ("correlation_id",), "event")
-    constants = {"message_type": "event", "schema": "ods.i8.piece_analysis",
-                 "schema_version": "1.0", "producer": "I8"}
+    constants = {"message_type": "event", "schema": SCHEMAS_BY_VERSION[version],
+                 "schema_version": version, "producer": "I8"}
     for field, expected in constants.items():
         if event[field] != expected:
             raise ContractError(f"{field}: expected {expected}")
@@ -70,7 +82,8 @@ def validate_piece_analysis(event, taxonomy):
         require_uuid(event[field], field)
     if "correlation_id" in event:
         require_uuid(event["correlation_id"], "correlation_id")
-    for field in ("published_at", "captured_at"):
+    time_fields = ("published_at", "captured_at") + (("occurred_at",) if version == "2.0" else ())
+    for field in time_fields:
         require_timestamp(event[field], field)
     for field in ("source_id", "artifact_version"):
         require_text(event[field], field)
@@ -116,11 +129,14 @@ def build_piece_analysis(*, taxonomy, source_id, session_id, sequence,
                          captured_at, artifact_version, frame_index,
                          detection_id, bbox, result, confidence, similarity,
                          defect_class=None, message_id=None, published_at=None,
-                         correlation_id=None):
+                         correlation_id=None, schema_version="1.0",
+                         occurred_at=None):
     """Build a validated observation, not an inference or business decision.
 
     Caller owns the monotonically increasing per-producer/session sequence.
     artifact_version must identify the model actually used, not the taxonomy.
+    Version 1.0 remains the expand-phase default. Industrial 2.0 requires occurred_at from the
+    caller, representing analysis completion; capture/publication stay separate.
     """
     payload = dict(frame_index=frame_index, detection_id=detection_id,
                    bbox=list(bbox) if isinstance(bbox, (list, tuple)) else bbox,
@@ -128,12 +144,16 @@ def build_piece_analysis(*, taxonomy, source_id, session_id, sequence,
                    confidence=confidence, similarity=similarity)
     if defect_class is not None:
         payload["defect_class"] = defect_class
+    if schema_version not in SCHEMAS_BY_VERSION:
+        raise ContractError("schema_version: expected legacy 1.0 or industrial 2.0; candidate 1.1 is superseded")
     event = dict(message_type="event", message_id=str(uuid4()) if message_id is None else message_id,
-                 schema="ods.i8.piece_analysis", schema_version="1.0", producer="I8",
+                 schema=SCHEMAS_BY_VERSION[schema_version], schema_version=schema_version, producer="I8",
                  published_at=published_at if published_at is not None else
                  datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z"),
                  captured_at=captured_at, source_id=source_id, session_id=session_id,
                  sequence=sequence, artifact_version=artifact_version, payload=payload)
+    if schema_version == "2.0" or occurred_at is not None:
+        event["occurred_at"] = occurred_at
     if correlation_id is not None:
         event["correlation_id"] = correlation_id
     return validate_piece_analysis(event, taxonomy)
