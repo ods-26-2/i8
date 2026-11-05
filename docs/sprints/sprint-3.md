@@ -4,10 +4,10 @@ Este índice organiza a documentação por assunto e pelo plano coletivo de fech
 
 ## Contrato Kafka I8/A1 — atividades 01–02
 
-Escopo: tópico/schema, versão candidata 1.1, captured_at/occurred_at/published_at, validação, fixtures e compatibilidade 1.0. Proposta local aceita; homologação externa TRA-1 pendente.
+Escopo: tópico/schema final `ods.industria.defeito_classificado`, versão 2.0, captured_at/occurred_at/published_at, validação, fixtures e compatibilidade explícita com legado `ods.i8.piece_analysis`/1.0. A candidata 1.1 foi substituída antes da ativação; aceite externo TRA-1 e transporte real permanecem pendentes.
 
-- [Contrato e decisões](../contratos/kafka-i8-1.1-candidato.md).
-- [Evidências de contrato](../evidencias/contrato-kafka-1.1/README.md).
+- [Contrato e decisões](../contratos/kafka-i8-2.0.md).
+- [Evidências de contrato](../evidencias/contrato-kafka-2.0/README.md).
 - PRs de revisão: [A1 #5](https://github.com/ods-26-2/a1/pull/5) e [I8 #5](https://github.com/ods-26-2/i8/pull/5).
 
 ## Ingestão Kafka A1 — atividades 03–05

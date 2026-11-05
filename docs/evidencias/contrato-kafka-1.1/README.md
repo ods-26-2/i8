@@ -1,5 +1,7 @@
 # Sprint 3 — Evidências do contrato Kafka 1.1
 
+**Histórico substituído:** a candidata 1.1 não será ativada. Consultar [contrato industrial 2.0](../../contratos/kafka-i8-2.0.md) e suas [novas evidências](../contrato-kafka-2.0/README.md). Os resultados abaixo correspondem ao código anterior, não ao runtime atual, que recusa 1.1.
+
 Esta alteração prepara o contrato que I8 publica e A1 recebe. Não implementa o publisher Kafka nem conclui a integração com broker real. O aceite externo de TRA-1 permanece pendente.
 
 ## O que foi verificado

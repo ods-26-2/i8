@@ -63,7 +63,13 @@ precedência é:
 sem margem são inclusivas nos limites configurados. `ANOMALY` é desvio detectado,
 enquanto `UNCERTAIN` é abstenção por evidência ambígua.
 
-O evento continua `ods.i8.piece_analysis`, schema `1.0`, produtor I8. A construção
+O contrato final Kafka é `ods.industria.defeito_classificado`, versão `2.0`, com
+`occurred_at` obrigatório indicando a conclusão da análise. A candidata `1.1` foi
+substituída antes da ativação. Durante a estratégia expand, o builder mantém por
+padrão o legado `ods.i8.piece_analysis`/`1.0`; a versão `2.0` deve ser solicitada
+explicitamente. Pares cruzados e a candidata substituída são recusados. Consulte
+[contrato e migração](docs/contratos/kafka-i8-2.0.md). O transporte Kafka e a
+ativação compartilhada ainda não estão implementados neste incremento. A construção
 e validação reutilizam `build_piece_analysis` e `validate_piece_analysis`.
 `taxonomy_version` e `artifact_version` identificam os artefatos efetivos;
 `defect_class` só é publicado em `NON_CONFORMING`. Mídia, evidência S4 e decisões

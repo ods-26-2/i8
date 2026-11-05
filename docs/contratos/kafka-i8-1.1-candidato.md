@@ -1,4 +1,6 @@
-# Sprint 3 — Contrato Kafka I8/A1
+# Histórico — candidata Kafka 1.1 substituída
+
+**SUBSTITUÍDA em 05/11/2026, antes da ativação.** O contrato final deste incremento é [industrial 2.0](kafka-i8-2.0.md): tópico/schema `ods.industria.defeito_classificado`, versão `2.0`. O runtime suporta somente esse par e o legado `ods.i8.piece_analysis`/`1.0`; recusa a candidata 1.1. O texto abaixo e seus resultados são um registro histórico, não instruções de ativação atuais.
 
 **Estado:** proposta local aceita por Ícaro; candidata em revisão por PR. O aceite externo de TRA-1 permanece pendente. A publicação do código não ativa o broker nem realiza merge.
 

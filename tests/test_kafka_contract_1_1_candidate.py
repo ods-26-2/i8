@@ -1,4 +1,4 @@
-"""Candidate 1.1 contract examples; runs offline without ML or transport."""
+"""Historical candidate 1.1 is superseded and cannot be activated."""
 import json
 from pathlib import Path
 import pytest
@@ -21,9 +21,10 @@ else:
         return validate_piece_analysis(event, Taxonomy())
 
 @pytest.mark.parametrize('path', sorted(EXAMPLES.glob('i8-piece-*.json')))
-def test_candidate_valid_examples(path):
+def test_superseded_candidate_cannot_be_published(path):
     event = json.loads(path.read_text())
-    assert validate(event) == event
+    with pytest.raises(Error, match="superseded"):
+        validate(event)
 
 @pytest.mark.parametrize('path', sorted((EXAMPLES / 'invalid').glob('*.json')))
 def test_candidate_invalid_examples(path):
