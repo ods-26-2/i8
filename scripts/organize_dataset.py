@@ -12,6 +12,7 @@ from pathlib import Path
 
 
 LABEL_DIRECTORIES = {
+    "ANOMALY": "anomalia",
     "AMASSADO": "amassado",
     "FURADO": "furo",
     "FURADO_AMASSADO": "furo_e_amassado",
@@ -62,6 +63,8 @@ def main() -> None:
         rows = list(csv.DictReader(stream))
     if not rows or not REQUIRED_COLUMNS.issubset(rows[0]):
         raise SystemExit(f"CSV deve conter: {sorted(REQUIRED_COLUMNS)}")
+    if any(row.get("source_image") for row in rows):
+        raise SystemExit("BLOQUEADO: organização de aumentos exige manifesto rastreável; não descartar source_image")
 
     args.output_root.mkdir(parents=True, exist_ok=True)
     manifest_path = args.output_root / "manifest.csv"

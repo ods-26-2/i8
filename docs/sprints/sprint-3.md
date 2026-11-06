@@ -1,5 +1,9 @@
 # Sprint 3 — Fechamento VER-1
 
+## Etapas 11–15: reprodução pendente por ausência dos dados
+
+Há modelos e métricas históricos, mas não imagens, manifesto real ou previsões de calibração/teste neste checkout. Consulte o [inventário e roteiro reproduzível](../evidencias/etapas-11-15/README.md). Não marcar as etapas concluídas com base em testes sintéticos ou no código das ferramentas.
+
 Este índice organiza a documentação por assunto e pelo plano coletivo de fechamento da Sprint 3. A numeração das sprints em documentos anteriores é mantida como histórico; este índice não redefine o backlog nem cria novos IDs de atividade.
 
 ## Contrato Kafka I8/A1 — atividades 01–02

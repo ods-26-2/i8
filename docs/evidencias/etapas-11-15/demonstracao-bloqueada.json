@@ -1,0 +1,35 @@
+{
+  "status": "BLOQUEADA",
+  "base_i8": "52301258ee27ed8b25ba9bc17a497630880398a9",
+  "escopo": "arquivos locais do repositório I8, inclusive ignorados; nenhum treino executado",
+  "inventario": "inventario-local.json",
+  "imagens_alegadas_na_entrega_anterior": 369,
+  "imagens_encontradas": 0,
+  "manifesto_real_encontrado": false,
+  "previsoes_calibracao_encontradas": false,
+  "previsoes_teste_encontradas": false,
+  "ANOMALY_real_verificada": false,
+  "replay_historico": {
+    "arquivo": "reports/replay-events-csv-001.jsonl",
+    "eventos": 4,
+    "schema_version": "1.0",
+    "resultados": ["NON_CONFORMING"],
+    "imagens_referenciadas": "D:\\ver-1\\dataset\\organized\\test",
+    "imagens_referenciadas_existem_neste_ambiente": false
+  },
+  "avaliacao_historica": {
+    "arquivo": "reports/evaluation-csv-001.json",
+    "amostras_declaradas": 74,
+    "suporte_ANOMALY": 0,
+    "reproduzida_neste_incremento": false
+  },
+  "bloqueios": [
+    "Fornecer imagens originais, manifesto e origem/licença/responsável pelos rótulos.",
+    "Confirmar separação por peça/sessão/hash e identificar aumentos com source_image.",
+    "Fornecer ou regenerar previsões de calibração e teste vinculadas aos hashes e versões.",
+    "Obter ANOMALY desconhecida rotulada e demonstrar resultado real, sem usar mocks.",
+    "Reexecutar os comandos documentados; artefatos e métricas históricos não provam esta reprodução."
+  ],
+  "etapas_11_a_15_concluidas": false,
+  "dados_sinteticos_usados_como_reais": false
+}
