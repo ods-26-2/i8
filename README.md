@@ -21,6 +21,8 @@ Torch: `import src.contracts, src.taxonomy`.
 
 ## Dataset e comandos
 
+**Etapas 11–15 ainda bloqueadas para reprodução neste checkout:** não foram encontradas as 369 imagens, manifesto real ou previsões de calibração/teste. Os modelos e relatórios publicados são históricos. Consulte o [inventário, correções e roteiro exato](docs/evidencias/etapas-11-15/README.md); nenhum mock substitui os dados ausentes.
+
 [`dataset/manifest.example.csv`](dataset/manifest.example.csv) documenta os
 campos `product_id,image,label,piece_id,session_id,split`; `source_image` é
 opcional para aumentos. Caminhos relativos são resolvidos a partir do manifesto.
@@ -31,7 +33,7 @@ peças ou sessões em splits diferentes e imagens duplicadas por SHA-256.
 uv run i8-prepare-dataset dataset/manifest.csv
 uv run i8-build-normal --product produto_001 --images data/produto_001/train/normal --output models
 uv run i8-train-classifier --manifest dataset/manifest.csv --taxonomy ..\a1\shared\artifacts\defect-taxonomy\defects-a1-1.0.0\content.json --taxonomy-descriptor ..\a1\shared\artifacts\defect-taxonomy\defects-a1-1.0.0\descriptor.json --taxonomy-version defects-a1-1.0.0 --product produto_001 --output models/classifier.json
-uv run i8-calibrate --input calibration.jsonl --output models/policy.json --product produto_001 --normal-version normal-1.0.0 --classifier-version classifier-1.0.0 --taxonomy-version defects-a1-1.0.0
+uv run i8-calibrate --input calibration.jsonl --manifest dataset/manifest.csv --output models/policy.json --product produto_001 --normal-version normal-1.0.0 --classifier-version classifier-1.0.0 --taxonomy-version defects-a1-1.0.0
 uv run i8-infer --image data/produto_001/test.jpg --normal-model models/normal_produto_001_normal-1.0.0.json --classifier models/classifier.json --policy models/policy.json --taxonomy ..\a1\shared\artifacts\defect-taxonomy\defects-a1-1.0.0\content.json --taxonomy-descriptor ..\a1\shared\artifacts\defect-taxonomy\defects-a1-1.0.0\descriptor.json --taxonomy-version defects-a1-1.0.0
 uv run i8-replay --input replay.jsonl --output events.jsonl --normal-model models/normal.json --classifier models/classifier.json --policy models/policy.json --taxonomy taxonomy.json --taxonomy-descriptor descriptor.json --taxonomy-version defects-a1-1.0.0 --artifact-version composition-1.0.0
 uv run i8-evaluate test-predictions.jsonl --output reports/evaluation.json

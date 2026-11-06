@@ -1,0 +1,257 @@
+{
+  "base_git": "52301258ee27ed8b25ba9bc17a497630880398a9",
+  "escopo": "repositório I8 completo, inclusive ignorados; lista imagens, CSV, JSON e JSONL; exclui metadados .git e o arquivo de saída",
+  "status": "BLOQUEADO_SEM_DADOS",
+  "imagens_locais": 0,
+  "csvs_nao_exemplo": 0,
+  "natureza": "não inferida pelos nomes; mocks e relatórios não comprovam imagens reais",
+  "arquivos": [
+    {
+      "path": "dataset/manifest.example.csv",
+      "sha256": "856fe013ab2fa37e05a8c9f865fca275bb4351e7583bb5f08db8bffb2035c891",
+      "bytes": 62,
+      "git": "local_nao_versionado"
+    },
+    {
+      "path": "dataset/proveniencia.example.json",
+      "sha256": "60d370e92295a187718441a85e46a201f87a8eab83812b5196398f172dc5cead",
+      "bytes": 134,
+      "git": "local_nao_versionado"
+    },
+    {
+      "path": "docs/evidencias/etapas-11-15/demonstracao-bloqueada.json",
+      "sha256": "9aa1a82d241128b5f9aa15bcd349be7eccb59b6e8dfd700c483bae36526c8919",
+      "bytes": 1517,
+      "git": "local_nao_versionado"
+    },
+    {
+      "path": "docs/evidencias/publicacao-kafka-i8/publisher-kafka.json",
+      "sha256": "bc197dd6b76ae973e8bb7d7b74ba283ac30668760dec1f8a0c454b1d11eb8a8c",
+      "bytes": 1222,
+      "git": "versionado"
+    },
+    {
+      "path": "docs/evidencias/s3-04/medicao.json",
+      "sha256": "249aae40071ec0f70589e997200342b587297a751d6d957ebbc56da57dd79a1c",
+      "bytes": 1640,
+      "git": "versionado"
+    },
+    {
+      "path": "models/classifier-caixa_papelao-classifier-csv-001.json",
+      "sha256": "ca146f0bc4adcc656d0fc00867f8609fb45ded9ebd4a0f9ab30fca685be4fe6d",
+      "bytes": 44885,
+      "git": "versionado"
+    },
+    {
+      "path": "models/normal_caixa_papelao_normal-csv-001.json",
+      "sha256": "f85e476974b2dd0b8c8cbf9c48f11c1d50a9951aa3e6e6c51fa4654c277e2dc5",
+      "bytes": 26104,
+      "git": "versionado"
+    },
+    {
+      "path": "models/policy-caixa_papelao-policy-csv-001.json",
+      "sha256": "50934f490840bf242e90fc91689199777013afb5e21a3cd69f5e04473969b98a",
+      "bytes": 394,
+      "git": "versionado"
+    },
+    {
+      "path": "reports/benchmark-csv-001.json",
+      "sha256": "ed1e8e69e71341a5b0cce8411c20e1d56b29fa7ecda9bd4b6081147570f68786",
+      "bytes": 1146,
+      "git": "versionado"
+    },
+    {
+      "path": "reports/evaluation-csv-001.json",
+      "sha256": "fa62d41914af1e44b3d8ccbd3ca85701240a8ba7fab45c254dc01c06ce1feef1",
+      "bytes": 2089,
+      "git": "versionado"
+    },
+    {
+      "path": "reports/replay-events-csv-001.jsonl",
+      "sha256": "0f563a09a5ad7dac301892aee9a158994e7c28945fd365f0999ed7a7998e3306",
+      "bytes": 2505,
+      "git": "versionado"
+    },
+    {
+      "path": "reports/replay-input-csv-001.jsonl",
+      "sha256": "76095666e84e8df8e85afcab42cdfa36dae5a62c036428457ff30cbdb89db970",
+      "bytes": 1012,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-1.1-candidate/i8-piece-anomaly.json",
+      "sha256": "761bb219bbed46e0dfd8b810b73c9960e2d4c5c89e0b21956799622c772b2855",
+      "bytes": 730,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-1.1-candidate/i8-piece-conforming.json",
+      "sha256": "b107aaceb5048c19583332a74a3c72efc16877142dd9ba72d9d65240fab2dc2f",
+      "bytes": 733,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-1.1-candidate/i8-piece-non-conforming.json",
+      "sha256": "eac15ff19c9f18c76924a6ebe900204e7bf4b78261f5421b45f61af103d6758d",
+      "bytes": 770,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-1.1-candidate/i8-piece-uncertain.json",
+      "sha256": "b8b391e17675f347498cc5fff29f2ac4272e76a965ec22d8c115dfdd9b9bbd4c",
+      "bytes": 731,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-1.1-candidate/invalid/anomaly-with-class.json",
+      "sha256": "f3274c7810c3e180a91280254c22c8ce358584c17cbbebcfad4efb48e038f7c3",
+      "bytes": 763,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-1.1-candidate/invalid/event-with-target.json",
+      "sha256": "1341dc2e610c49f5f3b595e7d1c9206b5e233cb8584dc5576a709761e7ea809a",
+      "bytes": 752,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-1.1-candidate/invalid/impossible-date.json",
+      "sha256": "b00201357f0d0e75f0a2ac61ec9f8d359ae34b1bbff1d0ddabe8d787cbdbed40",
+      "bytes": 733,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-1.1-candidate/invalid/missing-defect-class.json",
+      "sha256": "0d1118787bb1e857bc2cc416fc6d13f80bfbb1ec5c4221ba57dcd1dd3d2b5253",
+      "bytes": 737,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-1.1-candidate/invalid/missing-occurred-at.json",
+      "sha256": "1a0598b14cabc51167e2be8d06af943f08835ccfd2c617797787302b3e36571a",
+      "bytes": 687,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-1.1-candidate/invalid/owned-media.json",
+      "sha256": "448a6694af7fd674ef76aedc58829c3c67d64a9dae1c8357b939f37c0f02e009",
+      "bytes": 796,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-1.1-candidate/invalid/unknown-major.json",
+      "sha256": "abdaa84e62ed7f3c77a06acd174c3c81fdfe9bd0bfa90f6ffeb572f2e10445fb",
+      "bytes": 733,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-1.1-candidate/invalid/zero-area-bbox.json",
+      "sha256": "c2458650e7c16f31a8b84ae1949395ede24d6869ab369303a80ce7fcd243a9cf",
+      "bytes": 725,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-2.0/i8-piece-anomaly.json",
+      "sha256": "664c6e0fd1cd4f12642c74d7c95527d0ade6b62935d84aedbd7c41c4881bebbc",
+      "bytes": 715,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-2.0/i8-piece-conforming.json",
+      "sha256": "7390b3c566a2da4e14612a851afb6a183d70de23f464f263688292bcae910638",
+      "bytes": 718,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-2.0/i8-piece-non-conforming.json",
+      "sha256": "5298f104a0330f27df4d845e779f8ef3fb3214216a5c0fb6b07b700cebf18000",
+      "bytes": 754,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-2.0/i8-piece-uncertain.json",
+      "sha256": "8dfabcf26430a810dd3e013b86c6aa4c6d965adccceb1c7218ad80f8683f3a48",
+      "bytes": 716,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-2.0/invalid/anomaly-with-class.json",
+      "sha256": "bd31553fe85f68e39eea023fbbd9d633126d576ec8d39ae14aa389dd72f76d88",
+      "bytes": 747,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-2.0/invalid/event-with-target.json",
+      "sha256": "c5aa17927aee8816c6f0ddc7cadc27317ad1503f892cc12f1c3133aaa469a483",
+      "bytes": 736,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-2.0/invalid/impossible-date.json",
+      "sha256": "4783bfe88bdab15408d0ea7ac18bead0aac771659910ac11968eed8c0b8b0909",
+      "bytes": 718,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-2.0/invalid/missing-defect-class.json",
+      "sha256": "9c7884fe8cf4cfe224a0cdba9c22320dde4f9afa127f921ef3f1c5638371df66",
+      "bytes": 722,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-2.0/invalid/missing-occurred-at.json",
+      "sha256": "f8f1cbd26047c5d3ffd554380e955c01cf0aeb663270a1dd6273a02b689b7407",
+      "bytes": 673,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-2.0/invalid/owned-media.json",
+      "sha256": "fbc6960169d4d5163420858097798f6450c67c94b2ea3656bdcc7c4933680955",
+      "bytes": 778,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-2.0/invalid/unknown-major.json",
+      "sha256": "d69dfddf5a1eb88ed94fc33d456495c59514a97ea5aeccd98a8286c2a1201b4c",
+      "bytes": 718,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/mocks/kafka-2.0/invalid/zero-area-bbox.json",
+      "sha256": "83f272958068f5b60f329530f62bcfbe263a1abd4a222131b04f97a147c0e09e",
+      "bytes": 710,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/schemas/6c/defect-taxonomy-descriptor.schema.json",
+      "sha256": "c78a1c3497005cd740947f9acad68fb35f6f55b5c63c468ac155a4075ef618b6",
+      "bytes": 849,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/schemas/6c/defect-taxonomy.schema.json",
+      "sha256": "2eb0c5a6fc56a341d90e63b1f2cb29bf14de78b92b04df2368f567f77995b523",
+      "bytes": 831,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/schemas/6c/i8-defeito-classificado.2.0.schema.json",
+      "sha256": "fdbb4b40b73223d7e1f4e0c09d104d43984ce305b5ef2169797a949ee3a7fad8",
+      "bytes": 3500,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/schemas/6c/i8-piece-analysis.1.1.schema.json",
+      "sha256": "45912adfefabb0370c2d29e7173bd1e0beb116c5bdda30317ffcf4f4430e18bf",
+      "bytes": 3481,
+      "git": "versionado"
+    },
+    {
+      "path": "shared/schemas/6c/i8-piece-analysis.schema.json",
+      "sha256": "18148dbc110e303dc035bd5ea90ac3848f0b1b7279482237f18683c5d7b4b2e6",
+      "bytes": 2404,
+      "git": "versionado"
+    }
+  ],
+  "erros_acesso": []
+}

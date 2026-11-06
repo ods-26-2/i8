@@ -7,11 +7,9 @@ from pathlib import Path
 
 import numpy as np
 
-from feature_extractor import FeatureExtractor
 from normal_model import NormalModel
-from preprocessing import load_image
-from src.inference import DecisionPolicy, InferencePipeline, KnownDefectClassifier
 from src.taxonomy import load_taxonomy
+from scripts.prepare_dataset import file_hash, validate_manifest
 
 
 def main() -> None:
@@ -30,9 +28,14 @@ def main() -> None:
     if args.split == "test" and args.policy is None:
         parser.error("--policy é obrigatório para o split test")
 
-    rows = list(csv.DictReader(args.manifest.open(encoding="utf-8", newline="")))
-    rows = [row for row in rows if row["split"] == args.split]
+    inventory = validate_manifest(args.manifest)
     normal = NormalModel.load(args.normal_model)
+    rows = [row for row in inventory["images"] if row["split"] == args.split and row["product_id"] == normal.product_id]
+    if not rows:
+        parser.error("split sem amostras para o produto do modelo")
+    from feature_extractor import FeatureExtractor
+    from preprocessing import load_image
+    from src.inference import DecisionPolicy, InferencePipeline, KnownDefectClassifier
     taxonomy = load_taxonomy(args.taxonomy, args.taxonomy_descriptor,
                              expected_version=args.taxonomy_version)
     extractor = FeatureExtractor(args.device)
@@ -56,6 +59,17 @@ def main() -> None:
             result = pipeline.infer_embedding(np.asarray(embedding))
             record = {
                 **row,
+                "manifest_sha256": inventory["manifest_sha256"],
+                "image_sha256": row["sha256"],
+                "artifact_versions": {"product_id": normal.product_id,
+                    "normal_model_version": normal.model_version,
+                    "classifier_version": classifier.artifact_version,
+                    "taxonomy_version": taxonomy.version,
+                    "policy_version": policy.version if args.policy else "padrao_nao_calibrado"},
+                "artifacts_sha256": {name: file_hash(path) for name, path in {
+                    "normal": args.normal_model, "classifier": args.classifier,
+                    "taxonomy": args.taxonomy, **({"policy": args.policy} if args.policy else {}),
+                }.items()},
                 "similarity": result.similarity,
                 "predicted_result": result.result,
                 "predicted_defect_class": result.defect_class,
@@ -63,10 +77,10 @@ def main() -> None:
             }
             if args.split == "test":
                 record["expected_result"] = (
-                    "CONFORMING" if row["label"] == "CONFORMING" else "NON_CONFORMING"
+                    row["label"] if row["label"] in {"CONFORMING", "ANOMALY"} else "NON_CONFORMING"
                 )
                 record["expected_defect_class"] = (
-                    None if row["label"] == "CONFORMING" else row["label"]
+                    None if row["label"] in {"CONFORMING", "ANOMALY"} else row["label"]
                 )
             stream.write(json.dumps(record, ensure_ascii=False) + "\n")
     print(json.dumps({"split": args.split, "samples": len(rows), "output": str(args.output)}))
