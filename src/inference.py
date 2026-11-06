@@ -7,8 +7,8 @@ from PIL import Image
 from feature_extractor import FeatureExtractor
 from normal_model import NormalModel
 from normal_model.runtime import distance_to_normal
-from preprocessing import transform_image
 from src.taxonomy import Taxonomy
+from similarities_extractor import MotorSimilaridade
 
 RESULTS=("CONFORMING","NON_CONFORMING","ANOMALY","UNCERTAIN")
 POLICY_VERSION="policy-1.0.0"
@@ -77,6 +77,7 @@ class InferencePipeline:
         if classifier and (classifier.product_id!=normal_model.product_id or classifier.weights_name!=extractor.weights_name or classifier.preprocessing_version!=extractor.preprocessing_version or classifier.weights.shape[1]!=extractor.embedding_dim): raise ValueError("classificador incompatível")
         for defect in classifier.classes if classifier else []: taxonomy.resolve(defect,version=taxonomy.version)
         self.extractor,self.normal_model,self.classifier,self.taxonomy,self.policy=extractor,normal_model,classifier,taxonomy,policy
+        self.similarity = MotorSimilaridade(extractor=extractor)
     def infer_embedding(self,embedding):
         normal=distance_to_normal(embedding,self.normal_model); similarity=float(np.clip(normal.score,0,1)); known,known_confidence=self.classifier.predict(embedding) if self.classifier else (None,0.0); margin=self.policy.uncertain_margin
         if known is not None and known_confidence>=self.policy.known_confidence and similarity<self.policy.conforming_similarity: result,confidence,defect="NON_CONFORMING",known_confidence,known
@@ -85,7 +86,7 @@ class InferencePipeline:
         else: result,confidence,defect="UNCERTAIN",max(0,1-abs(similarity-self.policy.conforming_similarity)),None
         return InferenceResult(result,float(np.clip(confidence,0,1)),similarity,defect,self.normal_model.model_version)
     def infer(self,image):
-        with Image.open(image) if isinstance(image,(str,Path)) else _image_context(image) as loaded: embedding=self.extractor.extract(transform_image(loaded)).numpy()
+        with Image.open(image) if isinstance(image,(str,Path)) else _image_context(image) as loaded: embedding=self.similarity.extrair_vetor(loaded).squeeze(0).numpy()
         return self.infer_embedding(embedding)
 class _image_context:
     def __init__(self,image): self.image=image.convert("RGB")

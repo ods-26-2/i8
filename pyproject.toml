@@ -10,7 +10,7 @@ dependencies = ["numpy>=1.26,<3", "Pillow>=10,<12", "torch>=2.2", "torchvision>=
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["preprocessing", "feature_extractor", "normal_model", "src", "src.*", "scripts"]
+include = ["preprocessing", "feature_extractor", "normal_model", "similarities_extractor", "src", "src.*", "scripts"]
 
 [project.scripts]
 i8-prepare-dataset = "scripts.prepare_dataset:main"
@@ -22,6 +22,7 @@ i8-infer = "scripts.infer_image:main"
 i8-replay = "scripts.replay:main"
 i8-publish-events = "scripts.publish_events:main"
 i8-benchmark = "scripts.benchmark:main"
+i8-benchmark-similarity = "scripts.benchmark_similarity:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<9", "jsonschema>=4.23,<5"]

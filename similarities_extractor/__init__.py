@@ -1,50 +1,79 @@
-"""Extração de vetores e cálculo de similaridade entre imagens."""
+"""Shared extraction and explicit pairwise cosine similarity; no industrial triage."""
 
-import torch
-import torchvision.models as models
-import torchvision.transforms as transforms
-import torch.nn.functional as F
+import math
+from pathlib import Path
+
 from PIL import Image
+import torch
+import torch.nn.functional as F
+
+from feature_extractor import FeatureExtractor
+from preprocessing import load_image, transform_image
+
+
+class ImageProcessingError(ValueError):
+    """Image or extracted embedding is invalid."""
+
+
+class ModelInitializationError(RuntimeError):
+    """The canonical feature extractor could not be initialized."""
+
 
 class MotorSimilaridade:
-    def __init__(self, device_mode="auto"):
-        
-        # Configuração de Dispositivo 
-        if device_mode == "auto":
-            self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        else:
-            self.device = torch.device(device_mode)
-            
-        self.modelo = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
-        self.modelo.fc = torch.nn.Identity() 
-        self.modelo.to(self.device)
-        self.modelo.eval()
-        
-        # Pipeline de Pre-processamento
-        self.preprocesso = transforms.Compose([
-            transforms.Resize((224, 224)), # Redimensionamento
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ])
+    """Reuse a caller's extractor, or create one canonical extractor.
+
+    Extraction returns one CPU embedding with shape (1, D), preserving the
+    original public layout. Pairwise scores now use cosine-affine-v1 in [0,1].
+    This pairwise metric is separate from the calibrated normal-model score.
+    """
+
+    score_metric = "cosine-affine-v1"
+
+    def __init__(self, device_mode="auto", *, extractor=None):
+        try:
+            self.extractor = extractor if extractor is not None else FeatureExtractor(device_mode)
+        except Exception as exc:
+            raise ModelInitializationError(str(exc)) from exc
+        self.device = self.extractor.device
+        # Compatibility aliases reference the same model, never a second ResNet.
+        self.modelo = self.extractor.model
 
     def extrair_vetor(self, imagem_input):
-    
-        # Aceita tanto o caminho do arquivo (string) quanto a imagem em memoria (PIL Image).
-        
-        if isinstance(imagem_input, str):
-            img = Image.open(imagem_input).convert('RGB')
-        else:
-            img = imagem_input.convert('RGB')
-            
-        # Joga a imagem pre-processada para a GPU (ou CPU)
-        img_tensor = self.preprocesso(img).unsqueeze(0).to(self.device)
-        
-        with torch.no_grad():
-            vetor = self.modelo(img_tensor)
-            
-        return vetor
+        try:
+            if isinstance(imagem_input, (str, Path)):
+                tensor = load_image(Path(imagem_input))
+            elif isinstance(imagem_input, Image.Image):
+                tensor = transform_image(imagem_input)
+            else:
+                raise ValueError("Esperado caminho ou PIL.Image")
+            vector = self.extractor.extract(tensor)
+            if vector.ndim != 1 or vector.numel() != self.extractor.embedding_dim:
+                raise ValueError("Embedding deve conter uma única referência da dimensão esperada")
+            if not torch.isfinite(vector).all():
+                raise ValueError("Embedding não finito")
+            return vector.unsqueeze(0)
+        except Exception as exc:
+            raise ImageProcessingError(f"Falha ao extrair vetor da imagem: {exc}") from exc
+
+    @staticmethod
+    def _vector(value):
+        if not isinstance(value, torch.Tensor) or not value.is_floating_point():
+            raise ValueError("Embedding deve ser um tensor de ponto flutuante")
+        if value.ndim == 2 and value.shape[0] == 1:
+            value = value.squeeze(0)
+        if value.ndim != 1 or value.numel() == 0 or not torch.isfinite(value).all():
+            raise ValueError("Embedding deve ser um vetor finito e não vazio")
+        value = value.detach().to(device="cpu", dtype=torch.float64)
+        norm = torch.linalg.vector_norm(value)
+        if not torch.isfinite(norm) or norm <= 0:
+            raise ValueError("Embedding deve ter norma positiva e finita")
+        return value / norm
 
     def calcular_score(self, vetor_alvo, vetor_referencia):
-        # Calcula a similaridade de cosseno
-        similaridade = F.cosine_similarity(vetor_alvo, vetor_referencia)
-        return similaridade.item()
+        left, right = self._vector(vetor_alvo), self._vector(vetor_referencia)
+        if left.shape != right.shape:
+            raise ValueError("Embeddings possuem dimensões incompatíveis")
+        raw = F.cosine_similarity(left, right, dim=0).item()
+        if not math.isfinite(raw):
+            raise ValueError("Similaridade não finita")
+        return float(max(0.0, min(1.0, (raw + 1.0) / 2.0)))

@@ -2,6 +2,7 @@
 
 Para acompanhar a entrega do publisher, comece pelo
 [resumo da atividade 06 e sua relação com a arquitetura](docs/sprints/atividade-06-resumo.md).
+Para extração e similaridade, consulte o [resumo da atividade 10](docs/sprints/atividade-10-resumo.md).
 
 Fluxo local reproduzível: manifesto → modelo normal e classificador → calibração
 → inferência → evento 6c validado. A execução real usa ResNet18 com pesos oficiais
@@ -95,8 +96,10 @@ ponta.
 ## Estado Sprint 3
 
 - S3-01/S3-02: implementado — contrato 6c e taxonomia A1 versionada com hash.
-- S3-04: parcial — branch de similaridade de Ícaro inspecionada; a transformação
-  incompatível não foi mesclada.
+- S3-04: extrator e transformação compartilhados na inferência e similaridade;
+  validação de vetores, regressão Docker e medição CPU disponíveis para revisão
+  na branch `feat/s3-04-extrator-unico`. Referências antigas devem ser regeneradas;
+  o score já usado pelo modelo normal foi preservado.
 - S3-05: implementado no fluxo local; avaliação industrial permanece pendente
   até haver dataset real separado por peça/sessão.
 - S3-06: implementado no replay local; integração externa P2/P4/P6/B1 permanece
