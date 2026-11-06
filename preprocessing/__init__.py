@@ -24,8 +24,7 @@ def list_images(directory: Path) -> list[Path]:
 def load_image(path: Path) -> Tensor:
     """RGB, resize 256, recorte central 224 e normalização ImageNet."""
     with Image.open(path) as image:
-        rgb = ImageOps.exif_transpose(image).convert("RGB")
-        return WEIGHTS.transforms()(rgb)
+        return transform_image(image)
 
 
 def transform_image(image: Image.Image) -> Tensor:

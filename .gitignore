@@ -51,3 +51,4 @@ dist/
 
 # Generated evidence from the disposable Kafka publisher laboratory
 validacao-local/evidencias/
+validacao-local/evidencias-s304/

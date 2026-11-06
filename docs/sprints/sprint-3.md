@@ -28,7 +28,7 @@ O [publisher Kafka I8 e o replay opcional](../kafka-publisher.md) estão impleme
 
 ## Outros escopos do fechamento
 
-- Unificação de extração e similaridade, S3-04: atividade 10.
+- [Unificação de extração e similaridade, S3-04](atividade-10-resumo.md): atividade 10 implementada em branch separada para revisão; extrator compartilhado, regressão e medição CPU disponíveis.
 - Dataset, artefatos, calibração e avaliação: atividades 11–16.
 - Entrada/runtime I8, S3-06, e fluxo real: atividades 17–18.
 - Evidência S4, histórico, relatórios e métricas S5: atividades 19–23.

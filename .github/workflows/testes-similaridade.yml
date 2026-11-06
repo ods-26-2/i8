@@ -1,0 +1,44 @@
+name: Extração e similaridade I8 em Docker
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: similaridade-docker-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  extracao-similaridade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Preparar relatórios
+        run: mkdir -p validacao-local/evidencias-s304
+      - name: Construir ambiente CPU
+        run: docker build -f validacao-local/Dockerfile.inferencia -t ver1-i8-inferencia:test .
+      - name: Executar regressão completa em Docker sem rede
+        shell: bash
+        run: |
+          docker run --rm --network none --user "$(id -u):$(id -g)" \
+            -v "$PWD/validacao-local/evidencias-s304:/evidencias" \
+            ver1-i8-inferencia:test python -m pytest -q -p no:cacheprovider \
+            --junitxml=/evidencias/resultados.xml \
+            2>&1 | tee validacao-local/evidencias-s304/testes.log
+      - name: Publicar evidências
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidencias-similaridade-i8
+          path: validacao-local/evidencias-s304/
+          if-no-files-found: warn
+          retention-days: 30

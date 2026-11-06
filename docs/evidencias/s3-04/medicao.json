@@ -1,0 +1,53 @@
+{
+  "scope": "local CPU measurement; pairwise metric; not industrial evaluation or end-to-end latency",
+  "device": "cpu",
+  "platform": "Linux-6.12.113+deb13-amd64-x86_64-with-glibc2.41",
+  "machine": "x86_64",
+  "torch": "2.15.0+cpu",
+  "threads": 2,
+  "samples": 5,
+  "inputs": {
+    "reference": {
+      "path": "/data/entradas/referencia.ppm",
+      "sha256": "6aad6ec09ef9701d020f2785cca23e6647c9dc7d743fe6111b0bf7f65cd378aa"
+    },
+    "target": {
+      "path": "/data/entradas/alvo.ppm",
+      "sha256": "e039d557e8dbc9c8278c224538747b5a6550c491dd42ee2c2f42e68a2c61120a"
+    }
+  },
+  "extractor": "resnet18",
+  "weights": "IMAGENET1K_V1",
+  "embedding_dim": 512,
+  "preprocessing_version": "imagenet-resnet18-v1",
+  "score_metric": "cosine-affine-v1",
+  "scores": [
+    0.9681635689088408,
+    0.9681635689088408,
+    0.9681635689088408,
+    0.9681635689088408,
+    0.9681635689088408
+  ],
+  "same_extractor_instance": true,
+  "same_model_instance": true,
+  "model_parameter_bytes": 44706048,
+  "process_peak_rss_bytes": 425955328,
+  "memory_method": "ru_maxrss: whole-process peak including imports and weight loading; includes native Torch allocations",
+  "timing_ms": {
+    "reference_extraction": {
+      "min": 18.992978000824223,
+      "median": 19.12311900014174,
+      "max": 27.81543600031
+    },
+    "target_extraction": {
+      "min": 19.028205000722664,
+      "median": 19.13258400054474,
+      "max": 24.39996099928976
+    },
+    "pairwise_score": {
+      "min": 0.09502799912297633,
+      "median": 0.09996200060413685,
+      "max": 0.11709499995049555
+    }
+  }
+}
