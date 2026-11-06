@@ -1,0 +1,44 @@
+{
+  "status": "measured-local",
+  "hardware": "Windows-11-10.0.26200-SP0",
+  "device": "cpu",
+  "samples": 3,
+  "artifacts": {
+    "normal": "normal-csv-001",
+    "classifier": "classifier-csv-001",
+    "policy": "policy-1.0.0",
+    "taxonomy": "defects-a1-1.0.0"
+  },
+  "timing": {
+    "preprocess": {
+      "mean_ms": 25.9504000035425,
+      "p50_ms": 25.946400011889637,
+      "p95_ms": 25.946400011889637
+    },
+    "extraction": {
+      "mean_ms": 33.7283666691898,
+      "p50_ms": 32.72600000491366,
+      "p95_ms": 32.72600000491366
+    },
+    "decision": {
+      "mean_ms": 0.28206667047925293,
+      "p50_ms": 0.28730000485666096,
+      "p95_ms": 0.28730000485666096
+    },
+    "event_validation": {
+      "mean_ms": 0.3797999913028131,
+      "p50_ms": 0.35009998828172684,
+      "p95_ms": 0.35009998828172684
+    },
+    "total": {
+      "mean_ms": 60.533466671283044,
+      "p50_ms": 59.42299999878742,
+      "p95_ms": 59.42299999878742
+    }
+  },
+  "memory": {
+    "method": "tracemalloc peak Python allocations",
+    "peak_bytes_max": 305368,
+    "peak_bytes_mean": 305042.6666666667
+  }
+}

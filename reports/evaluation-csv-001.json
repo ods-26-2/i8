@@ -1,0 +1,92 @@
+{
+  "samples": 74,
+  "confusion_matrix": {
+    "CONFORMING": {
+      "CONFORMING": 2,
+      "NON_CONFORMING": 1,
+      "ANOMALY": 0,
+      "UNCERTAIN": 3
+    },
+    "NON_CONFORMING": {
+      "CONFORMING": 4,
+      "NON_CONFORMING": 40,
+      "ANOMALY": 0,
+      "UNCERTAIN": 24
+    },
+    "ANOMALY": {
+      "CONFORMING": 0,
+      "NON_CONFORMING": 0,
+      "ANOMALY": 0,
+      "UNCERTAIN": 0
+    },
+    "UNCERTAIN": {
+      "CONFORMING": 0,
+      "NON_CONFORMING": 0,
+      "ANOMALY": 0,
+      "UNCERTAIN": 0
+    }
+  },
+  "result_metrics": {
+    "CONFORMING": {
+      "support": 6,
+      "precision": 0.3333333333333333,
+      "recall": 0.3333333333333333,
+      "f1": 0.3333333333333333
+    },
+    "NON_CONFORMING": {
+      "support": 68,
+      "precision": 0.975609756097561,
+      "recall": 0.5882352941176471,
+      "f1": 0.7339449541284403
+    },
+    "ANOMALY": {
+      "support": 0,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    "UNCERTAIN": {
+      "support": 0,
+      "precision": 0.0,
+      "recall": 0,
+      "f1": 0
+    }
+  },
+  "defect_class_metrics": {
+    "AMASSADO": {
+      "support": 51,
+      "precision": 0.7894736842105263,
+      "recall": 0.5882352941176471,
+      "f1": 0.6741573033707866
+    },
+    "FURADO": {
+      "support": 2,
+      "precision": 0,
+      "recall": 0.0,
+      "f1": 0
+    },
+    "FURADO_AMASSADO": {
+      "support": 15,
+      "precision": 0.3333333333333333,
+      "recall": 0.06666666666666667,
+      "f1": 0.1111111111111111
+    }
+  },
+  "false_positive_known_defect": 1,
+  "false_negative_known_defect": 4,
+  "anomaly": {
+    "support": 0,
+    "detected": 0,
+    "recall": 0
+  },
+  "uncertain": {
+    "count": 27,
+    "rate": 0.36486486486486486
+  },
+  "coverage": 0.6351351351351351,
+  "denominators": {
+    "result_metrics": "one-vs-rest per result; support is expected count",
+    "known_defect_fp_fn": "positive means expected/predicted NON_CONFORMING",
+    "anomaly": "expected ANOMALY only; not counted as UNCERTAIN"
+  }
+}
