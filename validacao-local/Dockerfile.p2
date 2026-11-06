@@ -1,0 +1,11 @@
+FROM python:3.11-slim
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PYTHONPATH=/repo OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 P2_BACKEND=ort
+WORKDIR /repo
+RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu "torch>=2.2" "torchvision>=0.17"
+COPY --from=p2 pyproject.toml README.md /opt/p2/
+COPY --from=p2 src/ /opt/p2/src/
+RUN pip install --no-cache-dir '/opt/p2[cpu]' "numpy>=1.26,<2" "pytest>=8,<9" "Pillow>=10,<12" "jsonschema>=4.23,<5" "confluent-kafka>=2.6,<3" wheel
+COPY . .
+# Download official weights at build time. Runtime tests run with no network.
+RUN python -c "from feature_extractor import FeatureExtractor; FeatureExtractor('cpu')"
+CMD ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "tests/test_p2_extractor.py"]

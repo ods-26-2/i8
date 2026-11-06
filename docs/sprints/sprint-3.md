@@ -40,3 +40,7 @@ O [publisher Kafka I8 e o replay opcional](../kafka-publisher.md) estão impleme
 - Composição S3-12, regressão, desempenho, evidências e consolidação: atividades 28–32.
 
 Fonte de numeração: plano_fechamento_sprint3_dependencias.pdf fornecido pela equipe. Datas e aceites devem ser confirmados pelo grupo. Publicar uma branch ou um PR de rascunho não encerra uma atividade nem comprova uma dependência externa.
+
+## Atualização de dependências e runtime P2 — atividade 17
+
+[Fotografia dos repositórios e próximos passos](dependencias-fechamento-atualizacao.md). [Integração I8/P2 CPU, comandos Docker e limites](atividade-17-runtime-p2.md). Esta prova não encerra as atividades 15, 17 ou 18.

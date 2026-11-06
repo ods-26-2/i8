@@ -99,7 +99,7 @@ def test_non_image_bytes_are_rejected(dataset):
         validate_manifest(manifest)
 
 
-@pytest.mark.parametrize("path", ["../fora.png", "C:/dados/fora.png"])
+@pytest.mark.parametrize("path", ["../fora.png", "C:/dados/fora.png", "C:fora.png", r"\\servidor\dados\fora.png"])
 def test_manifest_paths_must_stay_under_manifest_directory(dataset, path):
     manifest, rows = dataset
     rows[0]["image"] = path

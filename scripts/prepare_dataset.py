@@ -5,7 +5,7 @@ import hashlib
 import json
 import math
 from collections import Counter
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 ALLOWED_SPLITS = {"train", "calibration", "test"}
 KNOWN_LABELS = {"AMASSADO", "FURADO", "FURADO_AMASSADO"}
@@ -19,7 +19,7 @@ def file_hash(path):
 
 def resolve_dataset_path(base, value, description):
     relative = Path(value)
-    if relative.is_absolute():
+    if relative.is_absolute() or PureWindowsPath(value).drive:
         raise ValueError(f"{description} deve usar caminho relativo ao manifesto")
     resolved = (base / relative).resolve()
     if not resolved.is_relative_to(base):

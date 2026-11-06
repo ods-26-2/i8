@@ -52,3 +52,7 @@ dist/
 # Generated evidence from the disposable Kafka publisher laboratory
 validacao-local/evidencias/
 validacao-local/evidencias-s304/
+
+# Disposable P2 lab, including exported ONNX and CPU engines
+validacao-local/evidencias-p2/
+.dependencias/

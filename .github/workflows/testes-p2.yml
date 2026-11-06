@@ -1,0 +1,44 @@
+name: Runtime I8 com P2 real em Docker
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  p2-cpu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Obter P2 na revisão validada
+        uses: actions/checkout@v4
+        with:
+          repository: ods-26-2/p2
+          ref: fddf028c025b4a9be22d3a67696a13c0c65b9b0e
+          path: .dependencias/p2
+          persist-credentials: false
+      - name: Construir ambiente CPU com P2 e pesos oficiais
+        run: docker build --build-context p2=.dependencias/p2 -f validacao-local/Dockerfile.p2 -t ver1-i8-p2:test .
+      - name: Regressão e equivalência numérica sem rede
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p validacao-local/evidencias-p2
+          docker run --rm --network none --cpus 2 --memory 3g \
+            -e P2_EVIDENCE_DIR=/evidencias \
+            -v "$PWD/validacao-local/evidencias-p2:/evidencias" \
+            ver1-i8-p2:test python -m pytest -q -p no:cacheprovider \
+            --junitxml=/evidencias/regressao.xml \
+            2>&1 | tee validacao-local/evidencias-p2/testes.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidencias-i8-p2-cpu
+          path: validacao-local/evidencias-p2/
+          retention-days: 30
+          if-no-files-found: warn

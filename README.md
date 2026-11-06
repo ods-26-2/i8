@@ -114,3 +114,5 @@ temporário fora do repositório. A validação do novo publisher está nas
 [evidências da atividade 06](docs/evidencias/publicacao-kafka-i8/README.md); ela não reexecuta a suíte completa com Torch.
 Não são escopo backend A1, banco, revisão humana,
 relatórios de negócio, S4, S5 ou P7.
+
+A integração explícita com a biblioteca P2 em CPU está descrita no [roteiro da atividade 17](docs/sprints/atividade-17-runtime-p2.md). A [atualização das dependências](docs/sprints/dependencias-fechamento-atualizacao.md) distingue código disponível, dados ausentes e provas ainda pendentes.
