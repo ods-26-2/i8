@@ -1,50 +1,51 @@
-"""Extração de vetores e cálculo de similaridade entre imagens."""
+"""Compatibility facade for the canonical I8 extraction pipeline.
+
+New code should use :class:`feature_extractor.FeatureExtractor` directly.
+This facade keeps the historical Portuguese API while guaranteeing the same
+ResNet18 weights and ImageNet preprocessing used by training and inference.
+"""
+
+from pathlib import Path
 
 import torch
-import torchvision.models as models
-import torchvision.transforms as transforms
 import torch.nn.functional as F
 from PIL import Image
+from torchvision.models import resnet18
+
+from feature_extractor import FeatureExtractor
+from preprocessing import WEIGHTS, transform_image
+
 
 class MotorSimilaridade:
-    def __init__(self, device_mode="auto"):
-        
-        # Configuração de Dispositivo 
-        if device_mode == "auto":
-            self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        else:
-            self.device = torch.device(device_mode)
-            
-        self.modelo = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
-        self.modelo.fc = torch.nn.Identity() 
-        self.modelo.to(self.device)
-        self.modelo.eval()
-        
-        # Pipeline de Pre-processamento
-        self.preprocesso = transforms.Compose([
-            transforms.Resize((224, 224)), # Redimensionamento
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ])
+    """Extract canonical embeddings and calculate bounded cosine similarity."""
 
-    def extrair_vetor(self, imagem_input):
-    
-        # Aceita tanto o caminho do arquivo (string) quanto a imagem em memoria (PIL Image).
-        
-        if isinstance(imagem_input, str):
-            img = Image.open(imagem_input).convert('RGB')
+    def __init__(self, device_mode: str = "auto", *, weights=WEIGHTS) -> None:
+        if weights is None:
+            model = resnet18(weights=None)
+            self.extractor = FeatureExtractor(device_mode, weights=None, model=model)
         else:
-            img = imagem_input.convert('RGB')
-            
-        # Joga a imagem pre-processada para a GPU (ou CPU)
-        img_tensor = self.preprocesso(img).unsqueeze(0).to(self.device)
-        
-        with torch.no_grad():
-            vetor = self.modelo(img_tensor)
-            
-        return vetor
+            self.extractor = FeatureExtractor(device_mode, weights=weights)
+        self.device = self.extractor.device
 
-    def calcular_score(self, vetor_alvo, vetor_referencia):
-        # Calcula a similaridade de cosseno
-        similaridade = F.cosine_similarity(vetor_alvo, vetor_referencia)
-        return similaridade.item()
+    def extrair_vetor(self, imagem_input: str | Path | Image.Image) -> torch.Tensor:
+        """Return a ``(1, 512)`` embedding using the canonical preprocessing."""
+        if isinstance(imagem_input, (str, Path)):
+            path = Path(imagem_input)
+            if not path.is_file():
+                raise FileNotFoundError(f"O ficheiro de imagem não existe: {path}")
+            with Image.open(path) as image:
+                tensor = transform_image(image)
+        elif isinstance(imagem_input, Image.Image):
+            tensor = transform_image(imagem_input)
+        else:
+            raise TypeError("imagem_input deve ser caminho ou PIL.Image.Image")
+        return self.extractor.extract(tensor).unsqueeze(0)
+
+    @staticmethod
+    def calcular_score(vetor_alvo: torch.Tensor, vetor_referencia: torch.Tensor) -> float:
+        """Return cosine similarity normalized from ``[-1, 1]`` to ``[0, 1]``."""
+        raw = float(F.cosine_similarity(vetor_alvo, vetor_referencia).item())
+        return max(0.0, min(1.0, (raw + 1.0) / 2.0))
+
+
+__all__ = ["MotorSimilaridade"]
