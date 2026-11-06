@@ -1,6 +1,6 @@
 """Replay frames/detections through correlation, real inference and 6c validation."""
 import argparse
-from contextlib import nullcontext
+from contextlib import nullcontext, ExitStack
 from datetime import datetime, timezone
 import json
 from pathlib import Path
@@ -69,8 +69,22 @@ def load_pipeline(args, taxonomy):
         args.policy, product_id=normal.product_id, normal_version=normal.model_version,
         classifier_version=classifier.artifact_version, taxonomy_version=taxonomy.version,
     )
-    return InferencePipeline(extractor=FeatureExtractor("cpu"), normal_model=normal,
-                             classifier=classifier, taxonomy=taxonomy, policy=policy)
+    engine = getattr(args, "p2_engine", None)
+    if engine:
+        from src.p2_extractor import P2FeatureExtractor
+        extractor = P2FeatureExtractor(engine)
+    else:
+        extractor = FeatureExtractor("cpu")
+    try:
+        if engine and args.artifact_version != extractor.engine_info["engine_version"]:
+            raise ValueError("--artifact-version deve identificar o engine_version P2 efetivo")
+        return InferencePipeline(extractor=extractor, normal_model=normal,
+                                 classifier=classifier, taxonomy=taxonomy, policy=policy)
+    except BaseException:
+        close = getattr(extractor, "close", None)
+        if close:
+            close()
+        raise
 
 
 def main(argv=None):
@@ -79,6 +93,7 @@ def main(argv=None):
         parser.add_argument(f"--{name}", type=Path, required=True)
     parser.add_argument("--taxonomy-version", required=True)
     parser.add_argument("--artifact-version", required=True)
+    parser.add_argument("--p2-engine", help="Engine ResNet18 P2 FP32/CPU instalado; exige P2_BACKEND=ort")
     parser.add_argument("--kafka", action="store_true", help="Publish industrial 2.0 with delivery confirmation")
     args = parser.parse_args(argv)
     if args.input.resolve() == args.output.resolve():
@@ -87,8 +102,12 @@ def main(argv=None):
     taxonomy = load_taxonomy(args.taxonomy, args.taxonomy_descriptor,
                              expected_version=args.taxonomy_version)
     pipeline = load_pipeline(args, taxonomy)
-    context = KafkaTransport(settings) if args.kafka else nullcontext(MemoryTransport())
-    with context as transport:
+    with ExitStack() as stack:
+        close = getattr(getattr(pipeline, "extractor", None), "close", None)
+        if close:
+            stack.callback(close)
+        context = KafkaTransport(settings) if args.kafka else nullcontext(MemoryTransport())
+        transport = stack.enter_context(context)
         publisher = EventPublisher(taxonomy, transport)
         mode = "x" if args.kafka else "w"
         with args.input.open(encoding="utf-8") as source, args.output.open(mode, encoding="utf-8") as output:

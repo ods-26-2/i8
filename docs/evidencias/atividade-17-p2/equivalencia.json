@@ -1,0 +1,28 @@
+{
+  "scope": "P2 real CPU FP32; pesos oficiais; imagens sinteticas; sem Kafka/A1",
+  "engine": "i8-resnet18-imagenet-1.0.0-fp32",
+  "samples": [
+    {
+      "seed": 1,
+      "max_abs_embedding_error": 2.6226043701171875e-06,
+      "latency_ms": 5.897516999539221,
+      "gpu_memory_mb": 0.0
+    },
+    {
+      "seed": 2,
+      "max_abs_embedding_error": 2.205371856689453e-06,
+      "latency_ms": 5.36384699807968,
+      "gpu_memory_mb": 0.0
+    },
+    {
+      "seed": 3,
+      "max_abs_embedding_error": 3.814697265625e-06,
+      "latency_ms": 5.305427999701351,
+      "gpu_memory_mb": 0.0
+    }
+  ],
+  "atol": 5e-05,
+  "rtol": 0.0001,
+  "torch": "2.15.0+cpu",
+  "numpy": "1.26.4"
+}
